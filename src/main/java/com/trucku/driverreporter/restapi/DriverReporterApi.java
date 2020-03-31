@@ -35,20 +35,16 @@ public class DriverReporterApi {
 
         try {
             DriverLocation driverLocation = new DriverLocation(location);
-            driverLocation.setDriver("somebody");
+            driverLocation.setDriver("somebody3");
             
             String serializedDriver = mapper.writeValueAsString(driverLocation);
             
             log.info("Sending...");
             kafkaProducer.send("driver-locations", serializedDriver).get();
-        } catch(ExecutionException e) {
-            System.out.println(e);
-        } catch(TimeoutException | InterruptedException e) {
-            System.out.println(e);
-        } catch(JsonProcessingException e) {
-            System.out.println(e);
+        } catch(ExecutionException | TimeoutException | InterruptedException | JsonProcessingException e) {
+            log.error("Error encountered sending Kafka message to topic [driver-locations]: %s", e);
         }
-
+        
         return ResponseEntity.ok().build();
     }
 
