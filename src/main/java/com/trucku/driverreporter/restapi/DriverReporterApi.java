@@ -1,5 +1,6 @@
 package com.trucku.driverreporter.restapi;
 
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,14 +33,12 @@ public class DriverReporterApi {
     @PostMapping("/location")
     public ResponseEntity<Void> reportDriverLocation(@RequestBody Location location) {
         ObjectMapper mapper = new ObjectMapper();
+        Random random = new Random();
 
         try {
             DriverLocation driverLocation = new DriverLocation(location);
-            driverLocation.setDriver("somebody3");
-            
+            driverLocation.setDriver("somebody" + String.valueOf(random.nextInt(21)));
             String serializedDriver = mapper.writeValueAsString(driverLocation);
-            
-            log.info("Sending...");
             kafkaProducer.send("driver-locations", serializedDriver).get();
         } catch(ExecutionException | TimeoutException | InterruptedException | JsonProcessingException e) {
             log.error("Error encountered sending Kafka message to topic [driver-locations]: %s", e);
